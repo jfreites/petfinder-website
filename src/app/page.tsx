@@ -26,6 +26,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
+import banner from "../../public/banner-petfinder.webp";
+
 // Initialize Supabase client
 // const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 // const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -80,16 +82,19 @@ export default function Home() {
 
   return (
     <main className="flex-1">
-      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+      <section
+        style={{ backgroundImage: `url(${banner.src})` }}
+        className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-cover bg-center bg-no-repeat"
+      >
         <div className="px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                Encuentra a tu mascota perdida
+            <div className="max-w-4xl space-y-2">
+              <h1 className="text-3xl text-balance font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                Ayudamos a mascotas extraviadas a encontrar su camino a casa
               </h1>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                Reporta un mascota perdida o encontrada y busca en nuestro
-                catálogo para reunir a las mascotas con sus dueños.
+              <p className="mx-auto max-w-[700px] text-slate-800 md:text-xl dark:text-gray-400">
+                Petfindr es una plataforma creada con el fin de ayudar a reunir
+                familias con sus mascotas perdidas.
               </p>
             </div>
             <div className="space-x-4">
@@ -113,10 +118,12 @@ export default function Home() {
           </h2>
           <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
             <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">
+                ¿Perdiste tu mascota o encontraste alguna extravida?
+              </Label>
               <Select>
                 <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="missing">Perdida</SelectItem>
@@ -125,10 +132,10 @@ export default function Home() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="species">Especie</Label>
+              <Label htmlFor="species">¿Es un gato o un perro?</Label>
               <Select>
                 <SelectTrigger id="species">
-                  <SelectValue placeholder="Select species" />
+                  <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="dog">Perro</SelectItem>
@@ -137,26 +144,26 @@ export default function Home() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Vista por última vez</Label>
+              <Label htmlFor="location">¿Donde fue vista por última vez?</Label>
               <Input id="location" placeholder="Ingresar ubicación" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Descripción</Label>
+              <Label htmlFor="description">Describe a la mascota</Label>
               <Textarea
                 id="description"
                 placeholder="Describe a la mascota y cualquier característica distintiva"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="photo">Photo</Label>
+              <Label htmlFor="photo">Foto</Label>
               <Input id="photo" type="file" accept="image/*" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contact">Contact Number</Label>
+              <Label htmlFor="contact">Número de contacto</Label>
               <Input
                 id="contact"
                 type="tel"
-                placeholder="Enter your contact number"
+                placeholder="Ingresar número de contacto"
               />
             </div>
             <Button type="submit" className="w-full">
