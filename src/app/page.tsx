@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+//import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,10 +24,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 // Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+// const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // if (!supabaseUrl || !supabaseAnonKey) {
 //   throw new Error('Missing Supabase environment variables')
@@ -201,9 +202,11 @@ export default function Home() {
                 <Card key={pet.id}>
                   <CardContent className="p-4">
                     <div className="aspect-square relative mb-4">
-                      <img
+                      <Image
                         src={pet.image}
                         alt={pet.name}
+                        width={100}
+                        height={100}
                         className="object-cover w-full h-full rounded-lg"
                       />
                       <span
