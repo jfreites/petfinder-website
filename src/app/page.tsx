@@ -93,7 +93,7 @@ export default function Home() {
                 Ayudamos a mascotas extraviadas a encontrar su camino a casa
               </h1>
               <p className="mx-auto max-w-[700px] text-slate-800 md:text-xl dark:text-gray-400">
-                Petfindr es una plataforma creada con el fin de ayudar a reunir
+                PetFinder es una plataforma creada con el fin de ayudar a reunir
                 familias con sus mascotas perdidas.
               </p>
             </div>
