@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -39,6 +40,7 @@ export default function ReportForm({
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -51,14 +53,36 @@ export default function ReportForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
-      // TODO: Upload image to Supabase Storage
-      const imagePath = null;
+      // Upload image to Supabase Storage
+      let imagePath = null;
+
+      if (imageFile) {
+        const fileExt = imageFile.name.split(".").pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("pet-images")
+          .upload(fileName, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        if (uploadData) {
+          imagePath = uploadData.fullPath;
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      }
 
       // Insert pet data into Supabase
       const { data, error } = await supabase
@@ -83,16 +107,19 @@ export default function ReportForm({
         description: "",
         contact_number: "",
       });
+      setImageFile(null);
 
       // Call the success callback
       onSubmitSuccess();
-      setIsLoading(false);
+
       alert("Pet report submitted successfully!");
     } catch (err) {
       console.error("Error submitting form:", err);
       setError(
         `Failed to submit form: ${(err as Error).message || "Unknown error"}`
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -160,7 +187,7 @@ export default function ReportForm({
           id="photo"
           type="file"
           accept="image/*"
-          //onChange={handleFileChange}
+          onChange={handleFileChange}
         />
       </div>
       <div className="space-y-2">

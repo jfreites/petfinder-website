@@ -191,7 +191,7 @@ export default function Home() {
                       </div>
                       <h3 className="font-semibold text-lg mb-2">
                         {pet.description.length > 30
-                          ? pet.description.substring(0, 35).concat(" ...")
+                          ? pet.description.substring(0, 30).concat(" ...")
                           : pet.description}
                       </h3>
                       <div className="flex items-center text-sm text-gray-500 mb-2">

@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  images: {
+    domains: [
+      "eniyiavrjwjxnebpuvzh.supabase.co",
+    ],
+  }
 };
 
 export default nextConfig;
