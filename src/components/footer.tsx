@@ -12,6 +12,14 @@ const Footer = () => {
         >
           Jonathan Freites
         </Link>
+        . Este proyecto es de código abierto, si quieres colaborar puedes hacer{" "}
+        <Link
+          className="text-xs hover:underline underline-offset-4"
+          href="https://github.com/jfreites/petfinder-website"
+          target="_blank"
+        >
+          click acá
+        </Link>
         .
       </p>
       <nav className="sm:ml-auto flex gap-4 sm:gap-6 text-gray-200">

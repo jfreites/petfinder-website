@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -14,10 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { PawPrint, MapPin, ChevronRight } from "lucide-react";
+import { PawPrint, MapPin } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-
+import ReportForm from "@/components/report-form";
 import banner from "../../public/banner-petfinder.webp";
 
 // Initialize Supabase client
@@ -44,13 +42,6 @@ export default function Home() {
   const [filter, setFilter] = useState({ species: "all", location: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    status: "",
-    specie: "",
-    location: "",
-    description: "",
-    contact_number: "",
-  });
 
   useEffect(() => {
     fetchPets();
@@ -88,56 +79,6 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // TODO: Upload image to Supabase Storage
-      const imagePath = null;
-
-      // Insert pet data into Supabase
-      const { data, error } = await supabase
-        .from("reports")
-        .insert({
-          ...formData,
-          photo: imagePath,
-        })
-        .select();
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        throw new Error("No data returned from insert operation");
-      }
-
-      // Reset form and refetch pets
-      setFormData({
-        status: "",
-        specie: "",
-        location: "",
-        description: "",
-        contact_number: "",
-      });
-      fetchPets();
-
-      alert("Pet report submitted successfully!");
-    } catch (err) {
-      console.error("Error submitting form:", err);
-      setError(
-        `Failed to submit form: ${(err as Error).message || "Unknown error"}`
-      );
-    }
-  };
-
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const filteredPets = pets.filter(
     (pet) =>
       (filter.species === "all" || pet.specie === filter.species) &&
@@ -155,11 +96,11 @@ export default function Home() {
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="max-w-4xl space-y-2">
               <h1 className="text-3xl text-balance text-primary/80 font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                Ayudamos a mascotas extraviadas a encontrar su camino a casa
+                Ayudamos mascotas extraviadas a encontrar el camino a casa
               </h1>
               <p className="mx-auto max-w-[700px] text-slate-900 font-medium md:text-xl dark:text-slate-400">
-                PetFinder es una plataforma creada con el fin de ayudar a reunir
-                familias con sus mascotas perdidas.
+                PetFinder es una plataforma pública creada con el fin de ayudar
+                a reunir familias con sus mascotas perdidas.
               </p>
             </div>
             <div className="space-x-4">
@@ -186,87 +127,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
             Reporta una mascota
           </h2>
-          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                name="status"
-                value={formData.status}
-                onValueChange={(value) =>
-                  handleInputChange({ target: { name: "status", value } })
-                }
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="missing">Perdida</SelectItem>
-                  <SelectItem value="found">Encontrada</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="specie">Especie</Label>
-              <Select
-                name="specie"
-                value={formData.specie}
-                onValueChange={(value) =>
-                  handleInputChange({ target: { name: "specie", value } })
-                }
-              >
-                <SelectTrigger id="specie">
-                  <SelectValue placeholder="Select species" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dog">Perro</SelectItem>
-                  <SelectItem value="cat">Gato</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location">¿Donde fue vista por última vez?</Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                placeholder="Enter location"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Describe a la mascota</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Describe the pet and any distinguishing features"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="photo">Photo</Label>
-              <Input
-                id="photo"
-                type="file"
-                accept="image/*"
-                //onChange={handleFileChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contact_number">Número de contacto</Label>
-              <Input
-                id="contact_number"
-                name="contact_number"
-                type="tel"
-                value={formData.contact_number}
-                onChange={handleInputChange}
-                placeholder="Enter your contact number"
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Enviar formulario <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
-          </form>
+          <ReportForm onSubmitSuccess={fetchPets} />
         </div>
       </section>
       <section id="catalog" className="w-full py-12 md:py-24 lg:py-32">
@@ -322,7 +183,7 @@ export default function Home() {
                           className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold ${
                             pet.status === "missing"
                               ? "bg-red-500 text-white"
-                              : "bg-green-500 text-white"
+                              : "bg-yellow-500 text-white"
                           }`}
                         >
                           {pet.status}
