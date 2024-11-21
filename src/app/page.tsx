@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import supabase from "@/lib/supabase-helper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,15 +18,7 @@ import Image from "next/image";
 import ReportForm from "@/components/report-form";
 import banner from "../../public/banner-petfinder.webp";
 
-// Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error("Missing Supabase environment variables");
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function Home() {
   interface Pet {
@@ -173,7 +165,7 @@ export default function Home() {
                     <CardContent className="p-4">
                       <div className="aspect-square relative mb-4">
                         <Image
-                          src={pet.photo || "https://placehold.co/100x100.svg"}
+                          src={`${supabaseUrl}/storage/v1/object/public/${pet.photo}`}
                           alt={pet.description}
                           width={100}
                           height={100}

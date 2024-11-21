@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import supabase from "@/lib/supabase-helper";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,16 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error("Missing Supabase environment variables");
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { validatePhoneNumber } from "@/lib/utils";
 
 export default function ReportForm({
   onSubmitSuccess,
@@ -65,6 +56,10 @@ export default function ReportForm({
     setError(null);
 
     try {
+      if (!validatePhoneNumber(formData.contact_number)) {
+        throw new Error("Invalid phone number");
+      }
+
       // Upload image to Supabase Storage
       let imagePath = null;
 
@@ -76,6 +71,8 @@ export default function ReportForm({
           .upload(fileName, imageFile);
 
         if (uploadError) throw uploadError;
+
+        console.log(uploadData);
 
         if (uploadData) {
           imagePath = uploadData.fullPath;
