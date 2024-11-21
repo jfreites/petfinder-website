@@ -17,13 +17,7 @@ const Header = () => {
           className="text-sm font-medium hover:underline underline-offset-4"
           href="#report"
         >
-          Reportar
-        </Link>
-        <Link
-          className="text-sm font-medium hover:underline underline-offset-4"
-          href="#catalog"
-        >
-          Catálogo
+          Reportar una mascota
         </Link>
       </nav>
     </header>
