@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import supabase from "@/lib/supabase-helper";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,11 +18,8 @@ import { ChevronRight } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { validatePhoneNumber } from "@/lib/utils";
 
-export default function ReportForm({
-  onSubmitSuccess,
-}: {
-  onSubmitSuccess: () => void;
-}) {
+export default function ReportForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     status: "",
     specie: "",
@@ -57,7 +55,7 @@ export default function ReportForm({
 
     try {
       if (!validatePhoneNumber(formData.contact_number)) {
-        throw new Error("Invalid phone number");
+        throw new Error("Número de teléfono inválido");
       }
 
       // Upload image to Supabase Storage
@@ -77,7 +75,7 @@ export default function ReportForm({
         if (uploadData) {
           imagePath = uploadData.fullPath;
         } else {
-          throw new Error("Failed to upload image");
+          throw new Error("No se pudo cargar la imagen");
         }
       }
 
@@ -107,9 +105,10 @@ export default function ReportForm({
       setImageFile(null);
 
       // Call the success callback
-      onSubmitSuccess();
+      //onSubmitSuccess();
+      router.refresh();
 
-      alert("Pet report submitted successfully!");
+      alert("La mascota fue reportada con éxito!");
     } catch (err) {
       console.error("Error submitting form:", err);
       setError(

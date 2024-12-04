@@ -1,82 +1,46 @@
-"use client";
+//"use client";
 
-import { useState, useEffect } from "react";
-import supabase from "@/lib/supabase-helper";
+//import { useState, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
+// import supabase from "@/lib/supabase-helper";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { PawPrint, MapPin } from "lucide-react";
+// import { Input } from "@/components/ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import { Card, CardContent } from "@/components/ui/card";
+// import { PawPrint, MapPin } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
+import { PetList } from "@/components/pet-list";
 import ReportForm from "@/components/report-form";
 import banner from "../../public/banner-petfinder.webp";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export default function Home() {
-  interface Pet {
-    id: number;
-    description: string;
-    specie: string;
-    location: string;
-    status: string;
-    photo: string;
-  }
+export default async function Home() {
+  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [filter, setFilter] = useState({ species: "all", location: "" });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [filter, setFilter] = useState({ species: "all", location: "" });
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data: reports } = await supabaseClient
+    .from("reports")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  const fetchPets = async () => {
-    try {
-      setIsLoading(true);
-      let query = supabase.from("reports").select("*");
-
-      if (filter.species !== "all") {
-        query = query.eq("specie", filter.species);
-      }
-      if (filter.location) {
-        query = query.ilike("location", `%${filter.location}%`);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      if (!data) {
-        throw new Error("No data returned from query");
-      }
-
-      setPets(data);
-    } catch (err) {
-      console.error("Error fetching pets:", err);
-      setError(
-        `Failed to fetch pets: ${(err as Error).message || "Unknown error"}`
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filteredPets = pets.filter(
-    (pet) =>
-      (filter.species === "all" || pet.specie === filter.species) &&
-      (filter.location === "" ||
-        pet.location.toLowerCase().includes(filter.location.toLowerCase()))
-  );
+  // const filteredPets = pets.filter(
+  //   (pet) =>
+  //     (filter.species === "all" || pet.specie === filter.species) &&
+  //     (filter.location === "" ||
+  //       pet.location.toLowerCase().includes(filter.location.toLowerCase()))
+  // );
 
   return (
     <main className="flex-1">
@@ -119,7 +83,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
             Reporta una mascota
           </h2>
-          <ReportForm onSubmitSuccess={fetchPets} />
+          <ReportForm />
         </div>
       </section>
       <section id="catalog" className="w-full py-12 md:py-24 lg:py-32">
@@ -127,9 +91,8 @@ export default function Home() {
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
             Mascotas reportadas
           </h2>
-
           <div className="md:max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
+            {/* <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
               <Select
                 value={filter.species}
                 onValueChange={(value) =>
@@ -153,52 +116,10 @@ export default function Home() {
                 }
                 className="w-full md:w-auto"
               />
+            </div> */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <PetList pets={reports} />
             </div>
-            {isLoading ? (
-              <p className="text-center">Cargando mascotas...</p>
-            ) : error ? (
-              <p className="text-red-500 text-center">{error}</p>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredPets.map((pet) => (
-                  <Card key={pet.id}>
-                    <CardContent className="p-4">
-                      <div className="aspect-square relative mb-4">
-                        <Image
-                          src={`${supabaseUrl}/storage/v1/object/public/${pet.photo}`}
-                          alt={pet.description}
-                          width={100}
-                          height={100}
-                          className="object-cover w-full h-full rounded-lg"
-                        />
-                        <span
-                          className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold ${
-                            pet.status === "missing"
-                              ? "bg-red-500 text-white"
-                              : "bg-yellow-500 text-white"
-                          }`}
-                        >
-                          {pet.status}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold text-lg mb-2">
-                        {pet.description.length > 30
-                          ? pet.description.substring(0, 30).concat(" ...")
-                          : pet.description}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-500 mb-2">
-                        <PawPrint className="w-4 h-4 mr-1" />
-                        {pet.specie}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {pet.location}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </section>
