@@ -1,21 +1,6 @@
-//"use client";
-
-//import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-// import supabase from "@/lib/supabase-helper";
 import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import { Card, CardContent } from "@/components/ui/card";
-// import { PawPrint, MapPin } from "lucide-react";
 import Link from "next/link";
-// import Image from "next/image";
 import { PetList } from "@/components/pet-list";
 import ReportForm from "@/components/report-form";
 import banner from "../../public/banner-petfinder.webp";
@@ -26,21 +11,10 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export default async function Home() {
   const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
-  // const [filter, setFilter] = useState({ species: "all", location: "" });
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
-
   const { data: reports } = await supabaseClient
     .from("reports")
     .select("*")
     .order("created_at", { ascending: false });
-
-  // const filteredPets = pets.filter(
-  //   (pet) =>
-  //     (filter.species === "all" || pet.specie === filter.species) &&
-  //     (filter.location === "" ||
-  //       pet.location.toLowerCase().includes(filter.location.toLowerCase()))
-  // );
 
   return (
     <main className="flex-1">
@@ -92,31 +66,6 @@ export default async function Home() {
             Mascotas reportadas
           </h2>
           <div className="md:max-w-7xl mx-auto">
-            {/* <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
-              <Select
-                value={filter.species}
-                onValueChange={(value) =>
-                  setFilter({ ...filter, species: value })
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filtrar por especie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="dog">Perros</SelectItem>
-                  <SelectItem value="cat">Gatos</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                placeholder="Filtrar por ubicación"
-                value={filter.location}
-                onChange={(e) =>
-                  setFilter({ ...filter, location: e.target.value })
-                }
-                className="w-full md:w-auto"
-              />
-            </div> */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <PetList pets={reports} />
             </div>
