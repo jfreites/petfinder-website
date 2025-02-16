@@ -2,17 +2,17 @@
 
 import { useState } from 'react'
 import Form from 'next/form'
-import { LocationStep } from "@/components/steps/LocationStep"
-import { LocationDetailsStep } from "@/components/steps/LocationDetailsStep"
-import { PhotoUploadStep } from "@/components/steps/PhotoUploadStep"
-import { ContactDetailsStep } from "@/components/steps/ContactDetailsStep"
+import { LocationStep } from "../components/steps/LocationStep"
+import { LocationDetailsStep } from "../components/steps/LocationDetailsStep"
+import { PhotoUploadStep } from "../components/steps/PhotoUploadStep"
+import { ContactDetailsStep } from "../components/steps/ContactDetailsStep"
 
 export function Wizard() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     location: '',
     nearestPlaces: '',
-    photo: null,
+    photo: null as File | null,
     name: '',
     email: '',
   })
