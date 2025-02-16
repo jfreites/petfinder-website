@@ -4,7 +4,11 @@ import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-export function LocationDetailsStep({ onNext }) {
+interface NearestPlacesProps {
+  onNext: (data: { nearestPlaces: string }) => void;
+}
+
+export function LocationDetailsStep({ onNext }: NearestPlacesProps) {
   const [nearestPlaces, setNearestPlaces] = useState('')
 
   const handleNext = () => {

@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation'
+//import { useRouter } from 'next/navigation'
 
 const mockAIService = async (photo: File) => {
+  console.log(photo.name);
   // Mock AI service call
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -14,11 +15,18 @@ const mockAIService = async (photo: File) => {
   })
 }
 
-export function PhotoUploadStep({ onNext, formData }) {
+interface PhotoUploadStepProps {
+  onNext: (data: { photo: File }) => void;
+  formData: any; // You can replace 'any' with a more specific type if available
+}
+
+export function PhotoUploadStep({ onNext, formData }: PhotoUploadStepProps) {
   const [photo, setPhoto] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [matchFound, setMatchFound] = useState(false)
-  const router = useRouter()
+  //const router = useRouter()
+
+  console.log(formData);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

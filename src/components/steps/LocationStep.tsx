@@ -4,7 +4,11 @@ import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-export function LocationStep({ onNext }) {
+interface LocationStepProps {
+  onNext: (data: { location: string }) => void;
+}
+
+export function LocationStep({ onNext }: LocationStepProps) {
   const [location, setLocation] = useState('')
 
   const validateLocation = async (location: string) => {
