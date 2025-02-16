@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: [
       "eniyiavrjwjxnebpuvzh.supabase.co",
+      "placehold.co",
     ],
   }
 };

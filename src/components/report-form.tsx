@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "@/lib/supabase-helper";
+//import supabase from "@/lib/supabase-helper";
+import { turso } from "@/lib/turso";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
+//import { v4 as uuidv4 } from "uuid";
 import { validatePhoneNumber } from "@/lib/utils";
 
 export default function ReportForm() {
@@ -59,40 +60,53 @@ export default function ReportForm() {
       }
 
       // Upload image to Supabase Storage
-      let imagePath = null;
+      //let imagePath = null;
 
       if (imageFile) {
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${uuidv4()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("pet-images")
-          .upload(fileName, imageFile);
+        console.log('upload image pending');
+        // const fileExt = imageFile.name.split(".").pop();
+        // const fileName = `${uuidv4()}.${fileExt}`;
+        // const { data: uploadData, error: uploadError } = await supabase.storage
+        //   .from("pet-images")
+        //   .upload(fileName, imageFile);
 
-        if (uploadError) throw uploadError;
+        // if (uploadError) throw uploadError;
 
-        console.log(uploadData);
+        // console.log(uploadData);
 
-        if (uploadData) {
-          imagePath = uploadData.fullPath;
-        } else {
-          throw new Error("No se pudo cargar la imagen");
-        }
+        // if (uploadData) {
+        //   imagePath = uploadData.fullPath;
+        // } else {
+        //   throw new Error("No se pudo cargar la imagen");
+        // }
+      }
+
+      // Insert into Turso
+      try {
+        await turso.execute({
+          sql: "INSERT INTO pet_reports (name, description, status, location, species, contact_number) VALUES (?, ?, ?, ?, ?, ?)",
+          args: ['Sin nombre', formData.description, formData.status, formData.location, formData.specie, formData.contact_number]
+        });
+
+      } catch (error) {
+        console.error(error);
+        throw new Error("No data returned from insert operation");
       }
 
       // Insert pet data into Supabase
-      const { data, error } = await supabase
-        .from("reports")
-        .insert({
-          ...formData,
-          photo: imagePath,
-        })
-        .select();
+      // const { data, error } = await supabase
+      //   .from("reports")
+      //   .insert({
+      //     ...formData,
+      //     photo: imagePath,
+      //   })
+      //   .select();
 
-      if (error) throw error;
+      // if (error) throw error;
 
-      if (!data || data.length === 0) {
-        throw new Error("No data returned from insert operation");
-      }
+      // if (!data || data.length === 0) {
+      //   throw new Error("No data returned from insert operation");
+      // }
 
       // Reset form and refetch pets
       setFormData({

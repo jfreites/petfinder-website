@@ -1,20 +1,18 @@
-import { createClient } from "@supabase/supabase-js";
+import { turso } from "@/lib/turso";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PetList } from "@/components/pet-list";
 import ReportForm from "@/components/report-form";
 import banner from "../../public/banner-petfinder.webp";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
 export default async function Home() {
-  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  //await turso.sync();
+  await turso.batch([
+    "CREATE TABLE IF NOT EXISTS pet_reports (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, status TEXT, location TEXT, image_path TEXT NULL, species TEXT, contact_number TEXT NULL)",
+    ], "write",
+  );
 
-  const { data: reports } = await supabaseClient
-    .from("reports")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const { rows } = await turso.execute("SELECT * FROM pet_reports ORDER BY id DESC");
 
   return (
     <main className="flex-1">
@@ -67,7 +65,7 @@ export default async function Home() {
           </h2>
           <div className="md:max-w-7xl mx-auto">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <PetList pets={reports} />
+              <PetList pets={rows} />
             </div>
           </div>
         </div>
