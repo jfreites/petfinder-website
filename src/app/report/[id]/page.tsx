@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { turso } from "@/lib/turso";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,29 +14,66 @@ export const metadata: Metadata = {
   description: "Reporte de mascotas perdidas",
 };
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+type Pet = {
+  id: number;
+  name?: string;
+  description: string;
+  status: string;
+  location: string;
+  imagePath?: string;
+  species: string;
+  contactNumber?: string;
+};
 
 export default async function PetReportPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
   const { id } = await params;
 
-  // check localstorage for user with a day of expiration to avoid unnecessary requests
+  // create a client component in order to use localstorage to save the data and avoid extra charges in Turso
+  const pet: Pet = {
+    id: 0,
+    description: '',
+    status: '',
+    location: '',
+    species: '',
+    imagePath: ''
+  };
 
-  const { data: reports, error } = await supabaseClient
-    .from("reports")
-    .select("*")
-    .eq("id", id);
+  try {
+    const results = await turso.execute({
+      sql: "SELECT * FROM pet_reports WHERE id = ?",
+      args: [id]
+    });
 
-  if (error) {
+    console.log(results.rows);
+
+    if (results.rows) {
+      if (results.rows[0].id !== null) {
+        pet.id = Number(results.rows[0].id);
+      }
+      if (results.rows[0].description !== null) {
+        pet.description = String(results.rows[0].description);
+      }
+      if (results.rows[0].image_path !== null) {
+        pet.description = String(results.rows[0].image_path);
+      }
+      if (results.rows[0].status !== null) {
+        pet.status = String(results.rows[0].status);
+      }
+      if (results.rows[0].species !== null) {
+        pet.species = String(results.rows[0].species);
+      }
+      if (results.rows[0].location !== null) {
+        pet.location = String(results.rows[0].location);
+      }
+    }
+
+  } catch (error) {
     throw error;
   }
-
-  const pet = reports[0];
 
   return (
     <main className="flex-1">
@@ -45,13 +82,13 @@ export default async function PetReportPage({
           <div className="my-4">
             <Link href="/" className="flex flex-row">
               <ChevronLeft className="w-4 h-4 mr-2 mt-1" />
-              <span>regresar al home</span>
+              <span>regresar al inicio</span>
             </Link>
           </div>
-          <article key={id}>
+          <article key={id} data-id={id}>
             <div className="aspect-square relative mb-4">
               <Image
-                src={`${supabaseUrl}/storage/v1/object/public/${pet.photo}`}
+                src={`https://placehold.co/400?text=${pet.imagePath}`}
                 alt=""
                 width={100}
                 height={100}
@@ -69,7 +106,7 @@ export default async function PetReportPage({
             </div>
             <div className="flex items-center text-sm text-gray-500 mb-2">
               <PawPrint className="w-4 h-4 mr-1" />
-              {pet.specie}
+              {pet.species}
             </div>
             <div className="flex items-center text-lg text-gray-800 mb-2">
               <MessageCircleWarningIcon className="w-4 h-4 mr-1" />
