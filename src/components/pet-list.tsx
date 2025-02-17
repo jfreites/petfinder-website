@@ -3,16 +3,19 @@ import { PawPrint, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Pet {
+type Pet = {
   id: number;
+  name?: string;
   description: string;
-  specie: string;
-  location: string;
   status: string;
-  photo: string;
-}
+  location: string;
+  imagePath?: string;
+  species: string;
+  contactNumber?: string;
+};
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+//const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const storageUrl = 'https://placehold.co/400';
 
 export function PetList({ pets }: { pets: Pet[] | null }) {
   return (
@@ -23,7 +26,7 @@ export function PetList({ pets }: { pets: Pet[] | null }) {
             <Link href={`/report/${pet.id}`}>
               <div className="aspect-square relative mb-4">
                 <Image
-                  src={`${supabaseUrl}/storage/v1/object/public/${pet.photo}`}
+                  src={`${storageUrl}?text=${pet.imagePath}`}
                   alt={pet.description}
                   width={100}
                   height={100}
@@ -46,7 +49,7 @@ export function PetList({ pets }: { pets: Pet[] | null }) {
               </h3>
               <div className="flex items-center text-sm text-gray-500 mb-2">
                 <PawPrint className="w-4 h-4 mr-1" />
-                {pet.specie}
+                {pet.species}
               </div>
               <div className="flex items-center text-sm text-gray-500">
                 <MapPin className="w-4 h-4 mr-1" />
