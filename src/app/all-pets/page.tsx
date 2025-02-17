@@ -1,12 +1,8 @@
 import { turso } from "@/lib/turso";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  ChevronRight,
-} from "lucide-react";
 import { PetList } from "@/components/pet-list";
-import ReportForm from "@/components/report-form";
-import banner from "../../public/banner-petfinder.webp";
+import banner from "../../../public/banner-petfinder.webp";
 
 type Pet = {
   id: number;
@@ -20,13 +16,7 @@ type Pet = {
 };
 
 export default async function Home() {
-  //await turso.sync();
-  await turso.batch([
-    "CREATE TABLE IF NOT EXISTS pet_reports (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, status TEXT, location TEXT, image_path TEXT NULL, species TEXT, contact_number TEXT NULL)",
-    ], "write",
-  );
-
-  const { rows } = await turso.execute("SELECT * FROM pet_reports ORDER BY id DESC LIMIT 6");
+  const { rows } = await turso.execute("SELECT * FROM pet_reports ORDER BY id DESC");
   const pets: Pet[] = rows.map((row: any) => ({
     id: row.id,
     name: row.name,
@@ -71,18 +61,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
-      <section
-        id="report"
-        className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800"
-      >
-        <div className="px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
-            Reporta una mascota
-          </h2>
-          <ReportForm />
-        </div>
-      </section>
-      <section id="pet-list" className="w-full py-12 md:py-24 lg:py-32">
+      <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
             Mascotas reportadas
@@ -91,12 +70,6 @@ export default async function Home() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <PetList pets={pets} />
             </div>
-          </div>
-          <div className="text-md tracking-tighter mt-6 md:text-lg mb-8 text-center hover:cursor-pointer hover:text-primary/90">
-            <Link href="/all-pets" className="flex flex-row items-center justify-center mx-auto">
-              <span>ver todas</span>
-              <ChevronRight className="w-4 h-4 mr-2" />
-            </Link>
           </div>
         </div>
       </section>

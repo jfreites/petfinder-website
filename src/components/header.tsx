@@ -21,7 +21,7 @@ const Header = () => {
         </Link>
         <Link
           className="text-sm font-medium hover:underline underline-offset-4"
-          href="#report"
+          href="#pet-list"
         >
           Reportar una mascota
         </Link>
