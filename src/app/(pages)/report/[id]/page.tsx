@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { turso } from "@/lib/turso";
+import { pb } from "@/lib/pocketbase";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -15,12 +15,12 @@ export const metadata: Metadata = {
 };
 
 type Pet = {
-  id: number;
+  id: string;
   name?: string;
   description: string;
   status: string;
   location: string;
-  imagePath?: string;
+  images?: string[];
   species: string;
   contactNumber?: string;
 };
@@ -34,43 +34,43 @@ export default async function PetReportPage({
 
   // create a client component in order to use localstorage to save the data and avoid extra charges in Turso
   const pet: Pet = {
-    id: 0,
+    id: '',
     description: '',
     status: '',
     location: '',
     species: '',
-    imagePath: ''
+    images: [],
   };
 
+  let collectionId = '';
+
   try {
-    const results = await turso.execute({
-      sql: "SELECT * FROM pet_reports WHERE id = ?",
-      args: [id]
-    });
+    console.log(id);
+    const report = await pb.collection('pet_reports').getOne(id)
+    console.log(report);
 
-    console.log(results.rows);
+    collectionId = report.collectionId;
 
-    if (results.rows) {
-      if (results.rows[0].id !== null) {
-        pet.id = Number(results.rows[0].id);
+    if (report) {
+      if (report.id !== null) {
+        pet.id = String(report.id);
       }
-      if (results.rows[0].description !== null) {
-        pet.description = String(results.rows[0].description);
+      if (report.description !== null) {
+        pet.description = String(report.description);
       }
-      if (results.rows[0].image_path !== null) {
-        pet.description = String(results.rows[0].image_path);
+      if (report.image !== null) {
+        pet.images = report.image;
       }
-      if (results.rows[0].status !== null) {
-        pet.status = String(results.rows[0].status);
+      if (report.status !== null) {
+        pet.status = String(report.status);
       }
-      if (results.rows[0].species !== null) {
-        pet.species = String(results.rows[0].species);
+      if (report.species !== null) {
+        pet.species = String(report.species);
       }
-      if (results.rows[0].location !== null) {
-        pet.location = String(results.rows[0].location);
+      if (report.location !== null) {
+        pet.location = String(report.location);
       }
     }
-
   } catch (error) {
     throw error;
   }
@@ -80,15 +80,15 @@ export default async function PetReportPage({
       <div className="py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
         <section className="max-w-5xl mx-auto space-y-8">
           <div className="my-4">
-            <Link href="/" className="flex flex-row">
+            <Link href="/all-pets" className="flex flex-row">
               <ChevronLeft className="w-4 h-4 mr-2 mt-1" />
-              <span>regresar al inicio</span>
+              <span>regresar al listado</span>
             </Link>
           </div>
           <article key={id} data-id={id}>
             <div className="aspect-square relative mb-4">
               <Image
-                src={`https://placehold.co/400?text=${pet.imagePath}`}
+                src={`https://pocketbase.dp.ungravity.dev/api/files/${collectionId}/${pet.id}/${pet.images?.[0] || ''}`}
                 alt=""
                 width={100}
                 height={100}
@@ -101,12 +101,12 @@ export default async function PetReportPage({
                     : "bg-yellow-500 text-white"
                 }`}
               >
-                {pet.status}
+                {pet.status === "missing" ? "Perdido" : "Encontrado"}
               </span>
             </div>
             <div className="flex items-center text-sm text-gray-500 mb-2">
               <PawPrint className="w-4 h-4 mr-1" />
-              {pet.species}
+              {pet.species === "dog" ? "Perro" : "Gato"}
             </div>
             <div className="flex items-center text-lg text-gray-800 mb-2">
               <MessageCircleWarningIcon className="w-4 h-4 mr-1" />

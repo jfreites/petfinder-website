@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import banner from "../../../public/pexels-egorov-10159624.webp";
+import banner from "/public/pexels-egorov-10159624.webp";
 
 export const metadata: Metadata = {
     title: "¿Cómo funciona PetFinder",

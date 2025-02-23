@@ -7,9 +7,15 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: [
-      "eniyiavrjwjxnebpuvzh.supabase.co",
-      "placehold.co",
+    // domains: [
+    //   "eniyiavrjwjxnebpuvzh.supabase.co",
+    //   "placehold.co",
+    //   "pb.dp.ungravity.dev"
+    // ],
+    remotePatterns: [
+      { hostname: "eniyiavrjwjxnebpuvzh.supabase.co" },
+      { hostname: "placehold.co" },
+      { hostname: "pocketbase.dp.ungravity.dev" },
     ],
   }
 };

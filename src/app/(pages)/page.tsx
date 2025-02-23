@@ -1,33 +1,24 @@
-import { turso } from "@/lib/turso";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PetList } from "@/components/pet-list";
+import {
+  ChevronRight,
+} from "lucide-react";
+import ReportForm from "@/components/report-form";
+import { PetReports } from "@/components/pet-reports";
 import banner from "../../../public/banner-petfinder.webp";
 
-type Pet = {
-  id: number;
-  name?: string;
-  description: string;
-  status: string;
-  location: string;
-  imagePath?: string;
-  species: string;
-  contactNumber?: string;
-};
+// type Pet = {
+//   id: number;
+//   name?: string;
+//   description: string;
+//   status: string;
+//   location: string;
+//   imagePath?: string;
+//   species: string;
+//   contactNumber?: string;
+// };
 
 export default async function Home() {
-  const { rows } = await turso.execute("SELECT * FROM pet_reports ORDER BY id DESC");
-  const pets: Pet[] = rows.map((row: any) => ({
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    status: row.status,
-    location: row.location,
-    imagePath: row.image_path,
-    species: row.species,
-    contactNumber: row.contact_number,
-  }));
-
   return (
     <main className="flex-1">
       <section
@@ -55,21 +46,38 @@ export default async function Home() {
                 variant="outline"
                 className="mt-2 md:mt-0"
               >
-                <Link href="#catalog">Mascotas reportadas</Link>
+                <Link href="#pet-list">Mascotas reportadas</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32">
+      <section
+        id="report"
+        className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800"
+      >
+        <div className="px-4 md:px-6">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
+            Reporta una mascota
+          </h2>
+          <ReportForm />
+        </div>
+      </section>
+      <section id="pet-list" className="w-full py-12 md:py-24 lg:py-32">
         <div className="px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
             Mascotas reportadas
           </h2>
           <div className="md:max-w-7xl mx-auto">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <PetList pets={pets} />
+              <PetReports />
             </div>
+          </div>
+          <div className="text-md tracking-tighter mt-6 md:text-lg mb-8 text-center hover:cursor-pointer hover:text-primary/90">
+            <Link href="/all-pets" className="flex flex-row items-center justify-center mx-auto">
+              <span>ver todas</span>
+              <ChevronRight className="w-4 h-4 mr-2" />
+            </Link>
           </div>
         </div>
       </section>

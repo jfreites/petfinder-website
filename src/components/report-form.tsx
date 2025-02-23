@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-//import supabase from "@/lib/supabase-helper";
-import { turso } from "@/lib/turso";
+import { pb } from "@/lib/pocketbase";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,21 +15,20 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-//import { v4 as uuidv4 } from "uuid";
 import { validatePhoneNumber } from "@/lib/utils";
 
 export default function ReportForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     status: "",
-    specie: "",
+    species: "",
     location: "",
     description: "",
     contact_number: "",
+    image: null as File | null,
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -44,8 +42,9 @@ export default function ReportForm() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // fix this if we need to upload multiple images
     if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
+      setFormData((prev) => ({ ...prev, image: e.target.files![0] }));
     }
   };
 
@@ -59,70 +58,25 @@ export default function ReportForm() {
         throw new Error("Número de teléfono inválido");
       }
 
-      // Upload image to Supabase Storage
-      //let imagePath = null;
-
-      if (imageFile) {
-        console.log('upload image pending');
-        // const fileExt = imageFile.name.split(".").pop();
-        // const fileName = `${uuidv4()}.${fileExt}`;
-        // const { data: uploadData, error: uploadError } = await supabase.storage
-        //   .from("pet-images")
-        //   .upload(fileName, imageFile);
-
-        // if (uploadError) throw uploadError;
-
-        // console.log(uploadData);
-
-        // if (uploadData) {
-        //   imagePath = uploadData.fullPath;
-        // } else {
-        //   throw new Error("No se pudo cargar la imagen");
-        // }
-      }
-
-      // Insert into Turso
-      try {
-        await turso.execute({
-          sql: "INSERT INTO pet_reports (name, description, status, location, species, contact_number) VALUES (?, ?, ?, ?, ?, ?)",
-          args: ['Sin nombre', formData.description, formData.status, formData.location, formData.specie, formData.contact_number]
-        });
-
-      } catch (error) {
-        console.error(error);
-        throw new Error("No data returned from insert operation");
-      }
-
-      // Insert pet data into Supabase
-      // const { data, error } = await supabase
-      //   .from("reports")
-      //   .insert({
-      //     ...formData,
-      //     photo: imagePath,
-      //   })
-      //   .select();
-
-      // if (error) throw error;
-
-      // if (!data || data.length === 0) {
-      //   throw new Error("No data returned from insert operation");
-      // }
+      // Insert into pocketbase
+      const record = await pb.collection('pet_reports').create({... formData});
+      console.log('inserted record', record);
 
       // Reset form and refetch pets
       setFormData({
         status: "",
-        specie: "",
+        species: "",
         location: "",
         description: "",
         contact_number: "",
+        image: null,
       });
-      setImageFile(null);
 
       // Call the success callback
       //onSubmitSuccess();
       router.refresh();
 
-      alert("La mascota fue reportada con éxito!");
+      alert("La mascota fue reportada con éxito!"); // implement a toast
     } catch (err) {
       console.error("Error submitting form:", err);
       setError(
@@ -156,13 +110,13 @@ export default function ReportForm() {
       <div className="space-y-2">
         <Label htmlFor="specie">Especie</Label>
         <Select
-          name="specie"
-          value={formData.specie}
+          name="species"
+          value={formData.species}
           onValueChange={(value) =>
-            handleSelectChange("specie", value as string)
+            handleSelectChange("species", value as string)
           }
         >
-          <SelectTrigger id="specie">
+          <SelectTrigger id="species">
             <SelectValue placeholder="¿Es un perro o un gato?" />
           </SelectTrigger>
           <SelectContent>
