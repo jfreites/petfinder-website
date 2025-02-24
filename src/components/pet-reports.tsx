@@ -1,13 +1,13 @@
 import { pb } from "@/lib/pocketbase";
 import { RecordModel } from "pocketbase";
 import { Card, CardContent } from "@/components/ui/card";
-import { PawPrint, MapPin } from "lucide-react";
+import { PawPrint, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export async function PetReports({ page }: { page?: number }) {
-  console.log("page", page);
+export async function PetReports({ page, limit }: { page?: number, limit?: number }) {
   page = page || 1;
+  limit = limit || 6;
 
   interface PetReport {
     id: string;
@@ -22,24 +22,23 @@ export async function PetReports({ page }: { page?: number }) {
   let reports: { items: PetReport[] } = { items: [] };
 
   try {
-          const pets = await pb.collection('pet_reports').getList(page, 6, {
-              sort: '-created',
-          })
-          reports = {
-            items: pets.items.map((item: RecordModel) => ({
-              id: item.id,
-              collectionId: item.collectionId,
-              image: item.image,
-              description: item.description,
-              status: item.status,
-              species: item.species,
-              location: item.location,
-            }))
-          }
-          console.log('reports', reports)
-      } catch (error) {
-          console.log('error', error);
+      const pets = await pb.collection('pet_reports').getList(page, limit, {
+          sort: '-created',
+      })
+      reports = {
+        items: pets.items.map((item: RecordModel) => ({
+          id: item.id,
+          collectionId: item.collectionId,
+          image: item.image,
+          description: item.description,
+          status: item.status,
+          species: item.species,
+          location: item.location,
+        }))
       }
+  } catch (error) {
+      console.log('error', error);
+  }
 
   return (
     <>
@@ -74,9 +73,17 @@ export async function PetReports({ page }: { page?: number }) {
                 <PawPrint className="w-4 h-4 mr-1" />
                 {pet.species === "dog" ? "Perro" : "Gato"}
               </div>
-              <div className="flex items-center text-sm text-gray-500">
+              <div className="flex items-center text-sm text-gray-500 mb-6">
                 <MapPin className="w-4 h-4 mr-1" />
                 {pet.location}
+              </div>
+              <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center mr-4 font-semibold">
+                  <span>Compartir en redes sociales</span>
+                  <Facebook className="w-6 h-6 mx-2 hover:text-primary" />
+                  <Instagram className="w-6 h-6 mx-2 hover:text-primary" />
+                  <Twitter className="w-6 h-6 mx-2 hover:text-primary" />
+                </div>
               </div>
             </Link>
           </CardContent>

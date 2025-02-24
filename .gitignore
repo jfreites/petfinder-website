@@ -41,3 +41,6 @@ next-env.d.ts
 
 # turso local development
 data/*
+
+# misc
+TODO.md

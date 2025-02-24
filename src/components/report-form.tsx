@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { pb } from "@/lib/pocketbase";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,13 +15,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronRight } from "lucide-react";
 import { validatePhoneNumber } from "@/lib/utils";
 
+type FormData = {
+  status: 'missing' | 'found'
+  circumstance?: 'in-possession' | 'sighting' | 'deceased'
+  species: string
+  location: string
+  description: string
+  contact_number: string
+  image: File | null
+}
+
 export default function ReportForm() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    status: "",
+  const [formData, setFormData] = useState<FormData>({
+    status: "missing",
     species: "",
     location: "",
     description: "",
@@ -35,6 +47,22 @@ export default function ReportForm() {
   ) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleStatusChange = (value: 'missing' | 'found') => {
+    setFormData(prev => ({
+      ...prev,
+      status: value,
+      // Clear circumstance when switching to 'missing'
+      circumstance: value === 'missing' ? undefined : prev.circumstance
+    }))
+  }
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -54,6 +82,11 @@ export default function ReportForm() {
     setError(null);
 
     try {
+      // Validate form data
+      if (formData.status === 'found' && !formData.circumstance) {
+        throw new Error('Please select the circumstance for the found pet')
+      }
+
       if (!validatePhoneNumber(formData.contact_number)) {
         throw new Error("Número de teléfono inválido");
       }
@@ -64,7 +97,7 @@ export default function ReportForm() {
 
       // Reset form and refetch pets
       setFormData({
-        status: "",
+        status: "missing",
         species: "",
         location: "",
         description: "",
@@ -89,7 +122,46 @@ export default function ReportForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
-      <div className="space-y-2">
+      <div className="space-y-3">
+        <Label>Status</Label>
+        <RadioGroup
+          defaultValue={formData.status}
+          value={formData.status}
+          onValueChange={(value: 'missing' | 'found') => handleStatusChange(value)}
+          className="flex flex-col space-y-1"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="missing" id="missing" />
+            <Label htmlFor="missing" className="font-normal">Missing Pet</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="found" id="found" />
+            <Label htmlFor="found" className="font-normal">Found Pet</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      {formData.status === 'found' && (
+        <div className="space-y-2">
+          <Label htmlFor="circumstance">Describe la circunstancia</Label>
+          <Select
+            name="circumstance"
+            value={formData.circumstance}
+            onValueChange={(value) => handleSelectChange('circumstance', value)}
+          >
+            <SelectTrigger id="circumstance">
+              <SelectValue placeholder="Select circumstance" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="in-possession">In my possession</SelectItem>
+              <SelectItem value="sighting">Sighting (Still roaming)</SelectItem>
+              <SelectItem value="deceased">Deceased</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
         <Select
           name="status"
@@ -106,7 +178,8 @@ export default function ReportForm() {
             <SelectItem value="found">Mascota encontrada</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
+
       <div className="space-y-2">
         <Label htmlFor="specie">Especie</Label>
         <Select
@@ -127,13 +200,19 @@ export default function ReportForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="location">¿Donde fue vista por última vez?</Label>
-        <Input
+        <LocationAutocomplete
+          value={formData.location}
+          onChange={(value) => handleLocationChange({
+            target: { name: 'location', value }
+          } as React.ChangeEvent<HTMLInputElement>)}
+        />
+        {/* <Input
           id="location"
           name="location"
           value={formData.location}
           onChange={handleInputChange}
           placeholder="Ingresa la ubicación donde fue vista la mascota"
-        />
+        /> */}
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Describe a la mascota</Label>
@@ -166,7 +245,7 @@ export default function ReportForm() {
         />
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Enviando..." : "Enviar formulario"}
+        {isLoading ? "Enviando..." : "Crear reporte"}
         <ChevronRight className="w-4 h-4 ml-2" />
       </Button>
       {error && <p className="text-red-500 text-center">{error}</p>}
