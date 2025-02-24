@@ -29,12 +29,12 @@ export function LocationAutocomplete({ value, onChange, className }: LocationAut
   const dummyElement = useRef<HTMLDivElement | null>(null)
 
   // Define bounds for Mexico
-  const mexicoBounds = {
-    north: 32.7187629, // Northern-most point
-    south: 14.5345486, // Southern-most point
-    west: -118.3644475, // Western-most point
-    east: -86.7104356, // Eastern-most point
-  }
+  // const mexicoBounds = {
+  //   north: 32.7187629, // Northern-most point
+  //   south: 14.5345486, // Southern-most point
+  //   west: -118.3644475, // Western-most point
+  //   east: -86.7104356, // Eastern-most point
+  // }
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !window.google) {
@@ -133,15 +133,15 @@ export function LocationAutocomplete({ value, onChange, className }: LocationAut
     }
 
     // Create bounds object for Mexico
-    const bounds = new google.maps.LatLngBounds(
-      { lat: mexicoBounds.south, lng: mexicoBounds.west }, // SW corner
-      { lat: mexicoBounds.north, lng: mexicoBounds.east }  // NE corner
-    )
+    // const bounds = new google.maps.LatLngBounds(
+    //   { lat: mexicoBounds.south, lng: mexicoBounds.west }, // SW corner
+    //   { lat: mexicoBounds.north, lng: mexicoBounds.east }  // NE corner
+    // )
 
     const request: google.maps.places.AutocompletionRequest = {
       input: value,
       componentRestrictions: { country: 'mx' }, // Restrict to Mexico
-      bounds: bounds, // Prioritize results within Mexico
+      //bounds: bounds, // Prioritize results within Mexico
       types: ['address'], // Get only address results
       language: 'es', // Set language to Spanish
     }

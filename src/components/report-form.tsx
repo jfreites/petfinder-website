@@ -20,6 +20,7 @@ import { ChevronRight } from "lucide-react";
 import { validatePhoneNumber } from "@/lib/utils";
 
 type FormData = {
+  name?: string
   status: 'missing' | 'found'
   circumstance?: 'in-possession' | 'sighting' | 'deceased'
   species: string
@@ -32,6 +33,7 @@ type FormData = {
 export default function ReportForm() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
+    name: "",
     status: "missing",
     species: "",
     location: "",
@@ -97,6 +99,7 @@ export default function ReportForm() {
 
       // Reset form and refetch pets
       setFormData({
+        name: "",
         status: "missing",
         species: "",
         location: "",
@@ -123,20 +126,20 @@ export default function ReportForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
       <div className="space-y-3">
-        <Label>Status</Label>
+        <Label>Status de la mascota</Label>
         <RadioGroup
           defaultValue={formData.status}
           value={formData.status}
           onValueChange={(value: 'missing' | 'found') => handleStatusChange(value)}
-          className="flex flex-col space-y-1"
+          className="flex flex-row space-x-4"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="missing" id="missing" />
-            <Label htmlFor="missing" className="font-normal">Missing Pet</Label>
+            <Label htmlFor="missing" className="font-normal">Mascota perdida</Label>
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="found" id="found" />
-            <Label htmlFor="found" className="font-normal">Found Pet</Label>
+            <Label htmlFor="found" className="font-normal">Mascota encontrada / Callejera</Label>
           </div>
         </RadioGroup>
       </div>
@@ -158,6 +161,19 @@ export default function ReportForm() {
               <SelectItem value="deceased">Deceased</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+      )}
+
+      {formData.status === 'missing' && (
+        <div className="space-y-2">
+          <Label htmlFor="name">Nombre de la mascota</Label>
+          <Input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Como se llama la mascota?"
+          />
         </div>
       )}
 

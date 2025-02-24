@@ -7,6 +7,7 @@ import {
   PawPrint,
   MessageCircleWarningIcon,
   MapPin,
+  Tag
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ type Pet = {
   images?: string[];
   species: string;
   contactNumber?: string;
+  circumstance?: string;
 };
 
 export default async function PetReportPage({
@@ -35,11 +37,13 @@ export default async function PetReportPage({
   // create a client component in order to use localstorage to save the data and avoid extra charges in Turso
   const pet: Pet = {
     id: '',
+    name: 'Desconocido',
     description: '',
     status: '',
     location: '',
     species: '',
     images: [],
+    circumstance: '',
   };
 
   let collectionId = '';
@@ -55,6 +59,9 @@ export default async function PetReportPage({
       if (report.id !== null) {
         pet.id = String(report.id);
       }
+      if (report.name !== null) {
+        pet.name = String(report.name);
+      }
       if (report.description !== null) {
         pet.description = String(report.description);
       }
@@ -69,6 +76,9 @@ export default async function PetReportPage({
       }
       if (report.location !== null) {
         pet.location = String(report.location);
+      }
+      if (report.circumstance !== null) {
+        pet.circumstance = String(report.circumstance);
       }
     }
   } catch (error) {
@@ -104,18 +114,28 @@ export default async function PetReportPage({
                 {pet.status === "missing" ? "Perdido" : "Encontrado"}
               </span>
             </div>
-            <div className="flex items-center text-sm text-gray-500 mb-2">
+            <div className="flex items-center text-md text-gray-500 mb-2">
               <PawPrint className="w-4 h-4 mr-1" />
               {pet.species === "dog" ? "Perro" : "Gato"}
+            </div>
+            <div className="flex items-center text-lg text-gray-800 mb-2">
+              <Tag className="w-4 h-4 mr-1" />
+              {pet.name || "Desconocido"}
             </div>
             <div className="flex items-center text-lg text-gray-800 mb-2">
               <MessageCircleWarningIcon className="w-4 h-4 mr-1" />
               {pet.description}
             </div>
-            <div className="flex items-center text-lg text-gray-500">
+            <div className="flex items-center text-lg text-gray-500 mb-2">
               <MapPin className="w-4 h-4 mr-1" />
               {pet.location}
             </div>
+            {pet.status === "found" && (
+              <div className="flex items-center text-lg text-gray-500">
+                <MessageCircleWarningIcon className="w-4 h-4 mr-1" />
+                {pet.circumstance}
+              </div>
+            )}
             <p className="py-6 text-center">
               {pet.status == "missing"
                 ? "Si tienes información del paradero de esta mascota envía un mensaje"
