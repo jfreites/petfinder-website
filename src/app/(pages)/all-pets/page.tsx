@@ -4,9 +4,11 @@ import Link from "next/link";
 import { PetReports } from "@/components/pet-reports";
 import banner from "/public/pexels-anastas-20439967.webp";
 import { Pagination } from "@/components/pagination";
+import { GoogleMapsPLaces } from "@/components/google-maps-places";
 
-export default function AllPetsPage({ searchParams }: { searchParams: { page?: string } }) {
-  const page = Number(searchParams.page) || 1;
+export default async function AllPetsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const params = await searchParams;
+  const page = Number(params.page) || 1;
   const limit = 12;
 
   return (
@@ -47,6 +49,8 @@ export default function AllPetsPage({ searchParams }: { searchParams: { page?: s
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-8 text-center">
             Mascotas reportadas
           </h2>
+
+          <GoogleMapsPLaces />
 
           <div className="md:max-w-7xl mx-auto">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
